@@ -1,6 +1,6 @@
 "use strict";
 
-const handleJsonImage = require("../app/services/handleJsonImage");
+const handleJsonImage = require("../app/Services/handleJsonImage");
 const db = require("../db/models");
 const AuthError = require("../app/Error/AuthError");
 const NotFoundError = require("../app/Error/NotFoundError");
