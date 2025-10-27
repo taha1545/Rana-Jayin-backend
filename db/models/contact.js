@@ -10,15 +10,14 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING,
             allowNull: true,
         },
-        phone: {
-            type: DataTypes.STRING,
-            allowNull: true,
-        },
         message: {
             type: DataTypes.STRING,
             allowNull: false,
         },
     }, {
-        tableName: "contacts"
+        tableName: "contacts",
+        timestamps: true,
+        createdAt: "createdAt",
+        updatedAt: false,
     });
 };

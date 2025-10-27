@@ -27,6 +27,17 @@ const checkAuth = (req, res, next) => {
     }
 };
 
+const checkMembre = (req, res, next) => {
+    if (!req.user) {
+        return next(new AuthError('User not authenticated'));
+    }
+    //
+    if (req.user.role !== 'membre ' && req.user.role !== 'admin') {
+        return next(new AuthError('Admin access required'));
+    }
+    next();
+};
+
 const checkAdmin = (req, res, next) => {
     if (!req.user) {
         return next(new AuthError('User not authenticated'));
@@ -40,5 +51,6 @@ const checkAdmin = (req, res, next) => {
 
 module.exports = {
     checkAuth,
-    checkAdmin
+    checkAdmin,
+    checkMembre
 };

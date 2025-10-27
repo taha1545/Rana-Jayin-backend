@@ -1,7 +1,6 @@
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-
 // 
 const uploadDir = './public/pfp/';
 if (!fs.existsSync(uploadDir)) {

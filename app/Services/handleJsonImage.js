@@ -1,17 +1,22 @@
 const fs = require("fs");
 const path = require("path");
 
-const PUBLIC_FOLDER = path.join(__dirname, "..", "public");
+const PUBLIC_FOLDER = path.join(__dirname, "..", "..", "public");
 const PFP_FOLDER = path.join(PUBLIC_FOLDER, "pfp");
 
 const handleJsonImage = async (user, newImageData) => {
-
     if (!newImageData) return;
+    // 
+    if (!fs.existsSync(PFP_FOLDER)) {
+        fs.mkdirSync(PFP_FOLDER, { recursive: true });
+    }
     // 
     if (user.imagePath) {
         const oldPath = path.join(__dirname, "..", user.imagePath);
-        if (fs.existsSync(oldPath)) {
-            fs.unlinkSync(oldPath);
+        try {
+            if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
+        } catch (err) {
+            console.error("Failed to delete old image:", err);
         }
     }
     // 
@@ -20,9 +25,8 @@ const handleJsonImage = async (user, newImageData) => {
     const newPath = path.join(PFP_FOLDER, filename);
 
     fs.writeFileSync(newPath, buffer);
-
     // 
-    user.imagePath = `public\\pfp\\${filename}`;
+    user.imagePath = `public/pfp/${filename}`;
     await user.save();
 };
 

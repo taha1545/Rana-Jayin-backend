@@ -1,70 +1,36 @@
-"use strict";
+'use strict';
 
 module.exports = {
-  //
   async up(queryInterface, Sequelize) {
-    //
-    return await queryInterface.createTable("users", {
-      id: {
-        allowNull: false,
-        autoIncrement: true,
-        primaryKey: true,
-        type: Sequelize.INTEGER,
-      },
-      name: {
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
-      email: {
-        type: Sequelize.STRING,
-        unique: true,
-        allowNull: false,
-      },
+    await queryInterface.createTable('users', {
+      id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
+      name: { type: Sequelize.STRING, allowNull: false },
+      phone: { type: Sequelize.STRING, allowNull: false, unique: true },
+      password: { type: Sequelize.STRING, allowNull: false },
       role: {
-        type: Sequelize.STRING,
+        type: Sequelize.ENUM('admin', 'member', 'client'),
         allowNull: false,
-        defaultValue: "client",
+        defaultValue: 'client',
       },
-      password: {
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
-      imagePath: {
-        type: Sequelize.STRING,
-        allowNull: true,
-      },
-      IsVerify: {
-        type: Sequelize.BOOLEAN,
-        allowNull: false,
-        defaultValue: false
-      },
+      imagePath: { type: Sequelize.STRING, allowNull: true },
+      isVerified: { type: Sequelize.BOOLEAN, defaultValue: false },
+      otp: { type: Sequelize.STRING, allowNull: true },
+      otpTime: { type: Sequelize.DATE, allowNull: true },
+      fcmToken: { type: Sequelize.STRING, allowNull: true },
       createdAt: {
-        allowNull: false,
         type: Sequelize.DATE,
-        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
+        allowNull: false,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
       },
       updatedAt: {
+        type: Sequelize.DATE,
         allowNull: false,
-        type: Sequelize.DATE,
-        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
       },
-      otpCode: {
-        type: Sequelize.STRING,
-        allowNull: true,
-      },
-      otpAt: {
-        type: Sequelize.DATE,
-        allowNull: true,
-      },
-      googleId: {
-        type: Sequelize.STRING,
-        unique: true,
-        allowNull: true
-      }
     });
   },
 
   async down(queryInterface, Sequelize) {
-    return await queryInterface.dropTable("users");
+    await queryInterface.dropTable('users');
   },
 };

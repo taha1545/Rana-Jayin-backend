@@ -1,36 +1,41 @@
 require('dotenv').config();
-
+//
 const express = require('express');
 const path = require('path');
 const cors = require('cors');
-
+const bodyParser = require('body-parser');
 const db = require('./db/models');
 const ErrorHandler = require('./app/Middlewares/Handle');
-const UserRouter = require('./Routes/AuthRoute');
-const GoogleRouter = require('./Routes/GoogleRoute');
-const contactRoutes = require('./Routes/ContactRoute');
-//
+const routes = require('./Routes');
 const app = express();
 
 // Middleware
-app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use('/public', express.static(path.join(__dirname, 'public')));
+app.use(cors({
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    exposedHeaders: ["Content-Disposition"],
+}));
+app.use(bodyParser.json({ limit: "20mb" }));
+app.use(bodyParser.urlencoded({ limit: "20mb", extended: true }));
+app.use(
+    "/public",
+    express.static(path.join(__dirname, "public"), {
+        setHeaders: (res, filePath) => {
+            res.setHeader("Access-Control-Allow-Origin", "*");
+            res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
+        },
+    })
+);
 
-// Routes
-app.use('/users', UserRouter);
-app.use('/auth', GoogleRouter);
-app.use('/api/contacts', contactRoutes);
 // 
-app.get('/', (req, res) => { res.json({ message: 'Welcome to the user + contact template API', token: req.query.token || null, }); });
+app.use('/api/v1', routes);
+app.get('/', (req, res) => { res.json({ message: 'Welcome to Rana Jayin Backend' }); });
 app.use((req, res) => { res.status(404).json({ message: 'No endpoint found for this request', }); });
-
-// error handler
 app.use(ErrorHandler);
 
 //   
-const PORT = process.env.APP_PORT;
+const PORT = process.env.APP_PORT || 80;
 db.sequelize
     .sync()
     .then(() => {

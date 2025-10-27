@@ -6,18 +6,18 @@ module.exports = {
     await queryInterface.bulkInsert('users', [
       {
         name: 'Taha Mansouri',
-        email: 'taha@example.com',
-        password: 'hashed_pass_1',
+        phone: '0673442786',
+        password: 'taha2005',
       },
       {
-        name: 'Ali B.',
-        email: 'ali@example.com',
-        password: 'hashed_pass_2',
+        name: 'smail ferdi',
+        phone: '0574365423',
+        password: 'tahta2005',
       },
       {
-        name: 'Sara K.',
-        email: 'sara@example.com',
-        password: 'hashed_pass_3',
+        name: 'samed nigga',
+        phone: '0782783223',
+        password: 'taha2005',
 
       }
     ], {});
