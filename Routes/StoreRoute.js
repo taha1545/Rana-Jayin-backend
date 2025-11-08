@@ -14,7 +14,7 @@ const ReviewValidation = require('../app/Validators/ReviewValidator');
 // Store routes
 Router.get("/stores", StoreController.getAllStores);
 Router.get("/stores/:id", StoreController.getStore);
-Router.post("/stores/member", StoreController.getStoresByMember);
+Router.post("/stores/member", StoreController.getStoreByMember);
 Router.get("/services", StoreController.showService);
 //
 Router.put("/stores/:id",
