@@ -235,3 +235,59 @@ exports.showService = async (req, res) => {
     });
 };
 
+exports.getStoresByMember = async (req, res) => {
+    const { membreId } = req.body;
+    if (!membreId) throw new NotFoundError("Member ID is required");
+
+    const stores = await db.Store.findAll({
+        where: { userId: membreId },
+        include: [
+            {
+                model: db.User,
+                as: "owner",
+                attributes: ["id", "name", "phone", "imagePath"],
+                include: [{ model: db.Payment, as: "payments" }],
+            },
+            { model: db.StoreImage, as: "images", attributes: ["id", "imageUrl"] },
+            {
+                model: db.Review,
+                as: "reviews",
+                attributes: ["id", "rating", "comment", "createdAt"],
+                include: [{ model: db.User, as: "client", attributes: ["id", "name"] }],
+            },
+            { model: db.Request, as: "requests", attributes: ["id"] },
+        ],
+    });
+
+    if (!stores || stores.length === 0) throw new NotFoundError("No stores found for this member");
+
+    const storesData = stores.map((store) => {
+        const storeJSON = store.toJSON();
+        const avgRating = calculateAverageRating(storeJSON.reviews);
+
+        return {
+            ...StoreResource(store),
+            member: store.owner
+                ? {
+                      id: store.owner.id,
+                      name: store.owner.name,
+                      phone: store.owner.phone,
+                      imagePath: store.owner.imagePath || null,
+                  }
+                : null,
+            averageRating: avgRating,
+            images: store.images || [],
+            reviews: store.reviews || [],
+            requestCount: store.requests ? store.requests.length : 0,
+            payments: store.owner?.payments || [],
+        };
+    });
+
+    res.status(200).json({
+        success: true,
+        message: "Member stores loaded successfully",
+        data: storesData,
+    });
+};
+
+
