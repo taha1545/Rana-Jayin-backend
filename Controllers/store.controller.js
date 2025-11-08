@@ -234,8 +234,9 @@ exports.showService = async (req, res) => {
         data: nearestStores,
     });
 };
+
 //
-exports.getStoresByMember = async (req, res) => {
+exports.getStoreByMember = async (req, res) => {
     let { membreId } = req.body;
     if (!membreId) throw new NotFoundError("Member ID is required");
 
@@ -243,7 +244,8 @@ exports.getStoresByMember = async (req, res) => {
     membreId = parseInt(membreId, 10);
     if (isNaN(membreId)) throw new NotFoundError("Member ID must be a valid number");
 
-    const stores = await db.Store.findAll({
+    // Fetch a single store with owner and payments, and images
+    const store = await db.Store.findOne({
         where: { userId: membreId },
         include: [
             {
@@ -253,46 +255,34 @@ exports.getStoresByMember = async (req, res) => {
                 include: [{ model: db.Payment, as: "payments" }],
             },
             { model: db.StoreImage, as: "images", attributes: ["id", "imageUrl"] },
-            {
-                model: db.Review,
-                as: "reviews",
-                attributes: ["id", "rating", "comment", "createdAt"],
-                include: [{ model: db.User, as: "client", attributes: ["id", "name"] }],
-            },
-            { model: db.Request, as: "requests", attributes: ["id"] },
         ],
     });
 
-    if (!stores || stores.length === 0) throw new NotFoundError("No stores found for this member");
+    if (!store) throw new NotFoundError("No store found for this member");
 
-    const storesData = stores.map((store) => {
-        const storeJSON = store.toJSON();
-        const avgRating = calculateAverageRating(storeJSON.reviews);
+    const storeJSON = store.toJSON();
 
-        return {
-            ...StoreResource(store),
-            member: store.owner
-                ? {
-                      id: store.owner.id,
-                      name: store.owner.name,
-                      phone: store.owner.phone,
-                      imagePath: store.owner.imagePath || null,
-                  }
-                : null,
-            averageRating: avgRating,
-            images: store.images || [],
-            reviews: store.reviews || [],
-            requestCount: store.requests ? store.requests.length : 0,
-            payments: store.owner?.payments || [],
-        };
-    });
+    const storeData = {
+        ...StoreResource(store),
+        member: store.owner
+            ? {
+                  id: store.owner.id,
+                  name: store.owner.name,
+                  phone: store.owner.phone,
+                  imagePath: store.owner.imagePath || null,
+              }
+            : null,
+        images: store.images || [],
+        payments: store.owner?.payments || [],
+    };
 
     res.status(200).json({
         success: true,
-        message: "Member stores loaded successfully",
-        data: storesData,
+        message: "Member store loaded successfully",
+        data: storeData,
     });
 };
+
 
 
 
