@@ -163,9 +163,21 @@ exports.showService = async (req, res) => {
     //
     const allStores = await db.Store.findAll({
         where: { isActive: true },
-        include: [
-            { model: db.User, as: "owner", attributes: ["id", "name", "phone"] },
-            { model: db.Review, as: "reviews", attributes: ["rating"] },
+      include: [
+            {
+                model: db.User,
+                as: "owner",
+            },
+            { model: db.StoreImage, as: "images", attributes: ["id", "imageUrl"] },
+            {
+                model: db.Review,
+                as: "reviews",
+                attributes: ["id", "rating", "comment", "createdAt"],
+                include: [
+                    { model: db.User, as: "client", attributes: ["id", "name"] },
+                ],
+            },
+            { model: db.Request, as: "requests", attributes: ["id"] },
         ],
     });
     //
