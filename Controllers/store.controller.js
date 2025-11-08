@@ -234,10 +234,14 @@ exports.showService = async (req, res) => {
         data: nearestStores,
     });
 };
-
+//
 exports.getStoresByMember = async (req, res) => {
-    const { membreId } = req.body;
+    let { membreId } = req.body;
     if (!membreId) throw new NotFoundError("Member ID is required");
+
+    // Ensure it's an integer
+    membreId = parseInt(membreId, 10);
+    if (isNaN(membreId)) throw new NotFoundError("Member ID must be a valid number");
 
     const stores = await db.Store.findAll({
         where: { userId: membreId },
@@ -289,5 +293,6 @@ exports.getStoresByMember = async (req, res) => {
         data: storesData,
     });
 };
+
 
 
