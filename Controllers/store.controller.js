@@ -218,14 +218,7 @@ exports.showService = async (req, res) => {
                 nearest.longitude
             ),
             store: {
-                ...StoreResource(nearest),
-                member: nearest.owner
-                    ? {
-                        id: nearest.owner.id,
-                        name: nearest.owner.name,
-                        phone: nearest.owner.phone,
-                    }
-                    : null,
+               store : nearest,
                 averageRating: avgRating,
             },
         });
