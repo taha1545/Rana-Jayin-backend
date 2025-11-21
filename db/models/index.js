@@ -14,6 +14,7 @@ db.StoreImage = require("./storeImage.js")(sequelize, Sequelize.DataTypes);
 db.Request = require("./request.js")(sequelize, Sequelize.DataTypes);
 db.Review = require("./review.js")(sequelize, Sequelize.DataTypes);
 db.Payment = require("./payment.js")(sequelize, Sequelize.DataTypes);
+db.Report = require("./report.js")(sequelize, Sequelize.DataTypes);
 
 // 
 Object.keys(db).forEach(modelName => {

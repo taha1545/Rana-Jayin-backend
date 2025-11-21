@@ -43,7 +43,8 @@ const signupValidationClient = [
         .withMessage("Password must have at least 6 characters."),
 ];
 
-// 
+
+//
 const signupValidationMembre = [
     // 🧍 Membre info
     body("name")
@@ -67,11 +68,20 @@ const signupValidationMembre = [
         .notEmpty()
         .withMessage("Please enter your store name."),
 
+    // type as JSON object
     body("type")
         .notEmpty()
-        .withMessage("Please select your store type.")
-        .isIn(AllTypeServices)
-        .withMessage("Invalid store type selected."),
+        .withMessage("Please select your store type."),
+
+    // car as JSON object (optional)
+    body("car")
+        .optional()
+        .custom((value) => {
+            if (typeof value !== "object" || Array.isArray(value) || value === null) {
+                throw new Error("Car must be a JSON object.");
+            }
+            return true;
+        }),
 
     body("description")
         .optional()
@@ -93,7 +103,6 @@ const signupValidationMembre = [
         .isString()
         .withMessage("Please enter your store price range."),
 ];
-
 
 // 
 const resetPasswordValidation = [

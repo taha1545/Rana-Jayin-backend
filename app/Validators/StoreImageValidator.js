@@ -9,6 +9,10 @@ const createImage = [
             const store = await db.Store.findByPk(storeId);
             if (!store) throw new Error('Store does not exist');
         }),
+    body('isAllowed')
+        .optional()
+        .isBoolean()
+        .withMessage('isAllowed must be true or false'),
 ];
 
 module.exports = { createImage };

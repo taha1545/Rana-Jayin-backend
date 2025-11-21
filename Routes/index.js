@@ -12,6 +12,7 @@ const contactRoutes = require('./ContactRoute');
 const membreDashRoutes = require('./MembreDashRoute');
 const paymentRoutes = require('./PaymentRoute');
 const requestRoutes = require('./RequestRoute');
+const reportRoutes = require('./ReportRoute');
 
 // Register routes
 Router.use('/', authRoutes);
@@ -21,5 +22,6 @@ Router.use('/membre', membreDashRoutes); //
 Router.use('/', paymentRoutes); // 
 Router.use('/', requestRoutes);
 Router.get('/admin/stats', AdminController.getAnalytics);
+Router.use('/', reportRoutes);
 
 module.exports = Router;

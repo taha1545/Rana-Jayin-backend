@@ -10,13 +10,25 @@ module.exports = {
         references: { model: 'users', key: 'id' },
         onDelete: 'CASCADE',
       },
+      //
       name: { type: Sequelize.STRING, allowNull: false },
-      type: { type: Sequelize.STRING, allowNull: false },
+      type: {
+        type: Sequelize.JSON,
+        allowNull: false,
+      },
       description: { type: Sequelize.TEXT, allowNull: true },
+      //
       latitude: { type: Sequelize.FLOAT, allowNull: true },
       longitude: { type: Sequelize.FLOAT, allowNull: true },
+      //
       isActive: { type: Sequelize.BOOLEAN, defaultValue: false },
       certificate: { type: Sequelize.STRING, allowNull: true },
+      //
+      car: {
+        type: Sequelize.JSON,
+        allowNull: true,
+      },
+      //
       priceRange: { type: Sequelize.STRING, allowNull: true },
       createdAt: {
         type: Sequelize.DATE,

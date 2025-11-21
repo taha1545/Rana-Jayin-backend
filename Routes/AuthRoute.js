@@ -7,6 +7,7 @@ const Upload = require('../app/Services/Storage');
 const AuthMiddleware = require('../app/Middlewares/Auth');
 const UserValidation = require('../app/Validators/UserValidator');
 const Validate = require('../app/Middlewares/validate');
+const parseJsonFields = require('../app/Middlewares/parseJsonFields');
 //
 Router.post("/signup-client", Upload.single("image"), UserValidation.signupValidationClient, Validate, AuthController.signupClient);
 // 
@@ -14,7 +15,13 @@ Router.post("/signup-membre",
     Upload.fields([
         { name: "certificate", maxCount: 1 },
         { name: "storeImages", maxCount: 10 },
-    ]), UserValidation.signupValidationMembre, Validate, AuthController.signupMembre);
+        { name: "sensitiveDocs", maxCount: 10 },
+    ]),
+    parseJsonFields(['type', 'car']),
+    UserValidation.signupValidationMembre,
+    Validate,
+    AuthController.signupMembre
+);
 // 
 Router.post("/login", Upload.single(), UserValidation.loginValidation, Validate, AuthController.login);
 // 

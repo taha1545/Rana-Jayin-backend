@@ -49,17 +49,23 @@ exports.signupMembre = async (req, res) => {
             password,
             storeName,
             type,
+            car,
             description,
             latitude,
             longitude,
             priceRange,
         } = req.body;
+
         // Handle files
         const certificate = req.files?.certificate
             ? req.files.certificate[0].path
             : null;
+
         const storeImages = req.files?.storeImages?.map(file => file.path) || [];
-        // 1️⃣ Create user
+        const sensitiveDocs = req.files?.sensitiveDocs?.map(file => file.path) || [];
+
+
+        // 1️ Create user
         const hashedPassword = await bcrypt.hash(password, 10);
         const user = await db.User.create(
             {
@@ -71,12 +77,14 @@ exports.signupMembre = async (req, res) => {
             },
             { transaction: t }
         );
-        // 2️⃣ Create store
+
+        // 2️ Create store
         const store = await db.Store.create(
             {
                 userId: user.id,
                 name: storeName,
                 type,
+                car,
                 description,
                 latitude,
                 longitude,
@@ -86,7 +94,8 @@ exports.signupMembre = async (req, res) => {
             },
             { transaction: t }
         );
-        // 3️⃣ Create store images
+
+        // 3️ Create store images
         const createdImages = [];
         for (const imageUrl of storeImages) {
             const img = await db.StoreImage.create(
@@ -95,10 +104,20 @@ exports.signupMembre = async (req, res) => {
             );
             createdImages.push(img);
         }
-        // 4️⃣ Create free payment (1 month)
+        //
+        const createdSensitiveImages = [];
+        for (const fileUrl of sensitiveDocs) {
+            const img = await db.StoreImage.create(
+                { storeId: store.id, imageUrl: fileUrl, isAllowed: false },
+                { transaction: t }
+            );
+            createdSensitiveImages.push(img);
+        }
+
+        // 4️ Create free payment (1 month)
         const startDate = dayjs().toDate();
         const endDate = dayjs().add(1, "month").toDate();
-        //
+
         const payment = await db.Payment.create(
             {
                 userId: user.id,
@@ -110,9 +129,12 @@ exports.signupMembre = async (req, res) => {
             },
             { transaction: t }
         );
+
         await t.commit();
+
         // Generate JWT
         const token = CreateToken({ id: user.id, role: user.role });
+
         // Response
         res.status(201).json({
             success: true,
@@ -123,11 +145,13 @@ exports.signupMembre = async (req, res) => {
                     id: store.id,
                     name: store.name,
                     type: store.type,
+                    car: store.car,
                     description: store.description,
                     latitude: store.latitude,
                     longitude: store.longitude,
                     isActive: store.isActive,
                     images: createdImages.map(StoreImageResource),
+                    sensitiveImages: createdSensitiveImages.map(StoreImageResource),
                 },
                 payment: PaymentResource(payment),
                 token,
@@ -138,6 +162,7 @@ exports.signupMembre = async (req, res) => {
         throw err;
     }
 };
+
 
 exports.login = async (req, res) => {
     //

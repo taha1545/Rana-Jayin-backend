@@ -70,7 +70,7 @@ exports.getStore = async (req, res) => {
                     { model: db.Payment, as: "payments" },
                 ],
             },
-            { model: db.StoreImage, as: "images", attributes: ["id", "imageUrl"] },
+            { model: db.StoreImage, as: "images", attributes: ["id", "imageUrl","isAllowed"] },
             {
                 model: db.Review,
                 as: "reviews",
@@ -114,7 +114,6 @@ exports.updateStore = async (req, res) => {
     //
     const {
         name,
-        type,
         description,
         latitude,
         longitude,
@@ -126,7 +125,6 @@ exports.updateStore = async (req, res) => {
     //
     await store.update({
         name,
-        type,
         description,
         latitude,
         longitude,
@@ -157,18 +155,20 @@ exports.deleteStore = async (req, res) => {
 
 exports.showService = async (req, res) => {
     const { latitude, longitude } = req.query;
-    //
+
+    // Validate coordinates
     if (!latitude || !longitude)
         throw new AppError("Latitude and longitude are required", 400);
-    //
+
+    // Fetch all active stores with relations
     const allStores = await db.Store.findAll({
         where: { isActive: true },
-      include: [
+        include: [
             {
                 model: db.User,
                 as: "owner",
             },
-            { model: db.StoreImage, as: "images", attributes: ["id", "imageUrl"] },
+            { model: db.StoreImage, as: "images", attributes: ["id", "imageUrl","isAllowed"] },
             {
                 model: db.Review,
                 as: "reviews",
@@ -180,19 +180,25 @@ exports.showService = async (req, res) => {
             { model: db.Request, as: "requests", attributes: ["id"] },
         ],
     });
-    //
+
     if (!allStores || allStores.length === 0)
         throw new NotFoundError("No active stores found");
-    //
+
     const nearestStores = [];
-    //
+
+    // Loop through each service type required
     for (const serviceType of AllTypeServices) {
-        // Filter stores by this specific service type
+
+        // Filter stores that include this service type inside JSON array
         const serviceStores = allStores.filter(
-            (store) => store.type === serviceType
+            (store) =>
+                Array.isArray(store.type) &&
+                store.type.includes(serviceType)
         );
+
         if (serviceStores.length === 0) continue;
-        // 
+
+        // Find nearest store for this service type
         const nearest = serviceStores.reduce((closest, current) => {
             const dist1 = getDistance(
                 latitude,
@@ -208,7 +214,9 @@ exports.showService = async (req, res) => {
             );
             return dist1 < dist2 ? closest : current;
         });
+
         const avgRating = calculateAverageRating(nearest.reviews);
+
         nearestStores.push({
             serviceType,
             distance: getDistance(
@@ -218,33 +226,31 @@ exports.showService = async (req, res) => {
                 nearest.longitude
             ),
             store: {
-               store : nearest,
+                store: nearest,
                 averageRating: avgRating,
             },
         });
     }
-    //
+
     if (nearestStores.length === 0)
         throw new NotFoundError("No nearby services found");
-    //
+
     res.status(200).json({
         success: true,
-        message:
-            "Nearest active stores for each service type retrieved successfully",
+        message: "Nearest active stores for each service type retrieved successfully",
         data: nearestStores,
     });
 };
+
 
 //
 exports.getStoreByMember = async (req, res) => {
     let { membreId } = req.body;
     if (!membreId) throw new NotFoundError("Member ID is required");
-
-    // Ensure it's an integer
+    //
     membreId = parseInt(membreId, 10);
     if (isNaN(membreId)) throw new NotFoundError("Member ID must be a valid number");
-
-    // Fetch a single store with owner and payments, and images
+    // 
     const store = await db.Store.findOne({
         where: { userId: membreId },
         include: [
@@ -257,25 +263,25 @@ exports.getStoreByMember = async (req, res) => {
             { model: db.StoreImage, as: "images", attributes: ["id", "imageUrl"] },
         ],
     });
-
+    //
     if (!store) throw new NotFoundError("No store found for this member");
-
+    //
     const storeJSON = store.toJSON();
-
+    //
     const storeData = {
         ...StoreResource(store),
         member: store.owner
             ? {
-                  id: store.owner.id,
-                  name: store.owner.name,
-                  phone: store.owner.phone,
-                  imagePath: store.owner.imagePath || null,
-              }
+                id: store.owner.id,
+                name: store.owner.name,
+                phone: store.owner.phone,
+                imagePath: store.owner.imagePath || null,
+            }
             : null,
         images: store.images || [],
         payments: store.owner?.payments || [],
     };
-
+    //
     res.status(200).json({
         success: true,
         message: "Member store loaded successfully",

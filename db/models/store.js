@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false,
         },
         type: {
-            type: DataTypes.STRING,
+            type: DataTypes.JSON,
             allowNull: false,
         },
         description: {
@@ -29,6 +29,10 @@ module.exports = (sequelize, DataTypes) => {
         isActive: {
             type: DataTypes.BOOLEAN,
             defaultValue: false,
+        },
+        car: {
+            type: DataTypes.JSON,
+            allowNull: true,
         },
         certificate: {
             type: DataTypes.STRING,

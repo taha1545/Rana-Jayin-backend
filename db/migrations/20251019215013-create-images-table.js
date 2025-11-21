@@ -10,6 +10,9 @@ module.exports = {
         references: { model: 'stores', key: 'id' },
         onDelete: 'CASCADE',
       },
+      isAllowed: {
+        type: Sequelize.BOOLEAN, defaultValue: true
+      },
       imageUrl: { type: Sequelize.STRING, allowNull: false },
     });
   },
