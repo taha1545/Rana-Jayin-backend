@@ -2,6 +2,7 @@ const { body } = require("express-validator");
 const db = require("../../db/models");
 //
 const AllTypeServices = [
+    // Existing Services (Keep these)
     "onSiteRepair",
     "towingService",
     "batteryBoost",
@@ -10,6 +11,12 @@ const AllTypeServices = [
     "safetyCheck",
     "accidentAssistance",
     "quickResponse",
+    
+    // New Services (Add these)
+    "carWash",        
+    "carRent",          
+    "carPartsSell",    
+    "mechanic"  
 ];
 //
 const checkPhoneExists = async (phone) => {

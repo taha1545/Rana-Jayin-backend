@@ -8,6 +8,7 @@ const AppError = require("../app/Error/AppError");
 const getDistance = require("../app/Services/CalculeDistance").getDistance;
 const calculateAverageRating = require("../app/Services/calculateAverageRating").calculateAverageRating;
 const AllTypeServices = [
+    // Existing Services (Keep these)
     "onSiteRepair",
     "towingService",
     "batteryBoost",
@@ -16,6 +17,12 @@ const AllTypeServices = [
     "safetyCheck",
     "accidentAssistance",
     "quickResponse",
+    
+    // New Services (Add these)
+    "carWash",        
+    "carRent",          
+    "carPartsSell",    
+    "mechanic"  
 ];
 // 
 exports.getAllStores = async (req, res) => {
