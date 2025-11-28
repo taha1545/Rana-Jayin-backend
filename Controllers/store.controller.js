@@ -12,11 +12,9 @@ const AllTypeServices = [
     "onSiteRepair",
     "towingService",
     "batteryBoost",
-    "emergencySupport",
     "fuelDelivery",
     "safetyCheck",
     "accidentAssistance",
-    "quickResponse",
     
     // New Services (Add these)
     "carWash",        
